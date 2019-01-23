@@ -1,0 +1,9 @@
+﻿{
+  "Id": "nuterra.worldeditor",
+  "DisplayName": "World Editor",
+  "Author": "Maritaria",
+  "Version": "2",
+  "Enable": true,
+  "AssemblyName": "NuterraWorldEditor.dll",
+  "EntryMethod": "Maritaria.WorldBuilder.Initiate.INIT"
+}
