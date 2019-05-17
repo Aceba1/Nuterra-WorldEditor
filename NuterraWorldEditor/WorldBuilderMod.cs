@@ -39,11 +39,8 @@ namespace Maritaria.WorldBuilder
         {
             try
             {
-                if (ManSpawn.inst == null) Console.WriteLine("ManSpawn.inst is NULL!"); else Console.WriteLine("Passed 1");
                 TerrainObjectTable table = (typeof(ManSpawn).GetField("m_TerrainObjectTable", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(ManSpawn.inst)) as TerrainObjectTable;
-                if (table == null) Console.WriteLine("table is NULL!"); else Console.WriteLine("Passed 2");
                 Dictionary<string, TerrainObject> m_GUIDToPrefabLookup = (typeof(TerrainObjectTable).GetField("m_GUIDToPrefabLookup", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(table)) as Dictionary<string, TerrainObject>;
-                if (m_GUIDToPrefabLookup == null) Console.WriteLine("PrefabLookup is NULL!"); else Console.WriteLine("Passed 3");
                 _prefabs = new List<TerrainObject>();
                 foreach (var value in m_GUIDToPrefabLookup)
                 {
@@ -268,7 +265,7 @@ namespace Maritaria.WorldBuilder
 		private void DeleteRock(bool hit, RaycastHit ray)
 		{
 
-            if (hit && ray.transform.gameObject.layer == Globals.inst.layerScenery)
+            if (hit)
             {
                 var obj = Singleton.Manager<ManPointer>.inst.targetObject;
                 try
