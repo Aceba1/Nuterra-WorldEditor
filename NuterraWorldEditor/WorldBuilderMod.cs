@@ -171,8 +171,17 @@ namespace Maritaria.WorldBuilder
 
         void RemoveObj(Transform obj)
         {
-            Transform var = obj.GetTopParent();
-            var.Recycle();
+            Transform transform = obj.GetTopParent();
+            var visible = obj.GetComponentInParent<Visible>();
+            if (visible)
+            {
+                visible.tileCache.tile.RemoveVisible(visible);
+                visible.RemoveFromGame();
+            }
+            else
+            {
+                transform.Recycle();
+            }
         }
 
 		private void UpdateGhostModel(RaycastHit ray)
