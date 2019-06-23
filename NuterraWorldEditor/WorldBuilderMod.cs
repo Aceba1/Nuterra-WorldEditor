@@ -44,7 +44,8 @@ namespace Maritaria.WorldBuilder
                 _prefabs = new List<TerrainObject>();
                 foreach (var value in m_GUIDToPrefabLookup)
                 {
-                    _prefabs.Add(value.Value);
+                    if (value.Value != null && value.Value is TerrainObject)
+                        _prefabs.Add(value.Value);
                 }
                 Ready = true;
             }
@@ -145,6 +146,9 @@ namespace Maritaria.WorldBuilder
 			}
 		}
 
+        /// <summary>
+        /// False for left, True for right
+        /// </summary>
         bool MoveDir = false;
 
 		private void SelectPreviousPrefab(RaycastHit ray)
@@ -172,7 +176,7 @@ namespace Maritaria.WorldBuilder
         void RemoveObj(Transform obj)
         {
             Transform transform = obj.GetTopParent();
-            var visible = obj.GetComponentInParent<Visible>();
+            var visible = Visible.FindVisibleUpwards(obj);
             if (visible)
             {
                 visible.tileCache.tile.RemoveVisible(visible);
@@ -221,6 +225,7 @@ namespace Maritaria.WorldBuilder
 		private GameObject CreateGhost(Vector3 pos)
 		{
             GameObject obj = null;
+            Retry:
             try
             {
                 obj = PlaceRock(pos, Quaternion.identity).TerrainObject.gameObject;
@@ -240,21 +245,29 @@ namespace Maritaria.WorldBuilder
             catch(Exception E)
             {
                 Console.WriteLine("EXCEPTION (WorldBuilder) " + E.Message + "\n" + (obj == null ? "Terrain object is null!" : ""));
+
+                _prefabs.RemoveAt(_selectedIndex);
+
+                if (_prefabs.Count == 0)
+                {
+                    throw new Exception("Nuterra-WorldEditor: There are no more prefabs!");
+                }
+
                 if (MoveDir)
                 {
-                    _selectedIndex++;
                     if (_selectedIndex >= _prefabs.Count - 1)
                     {
                         _selectedIndex = 0;
                     }
-                    return CreateGhost(pos);
+                    goto Retry;
                 }
+
                 _selectedIndex--;
-                if (_selectedIndex >= _prefabs.Count - 1)
+                if (_selectedIndex < 0)
                 {
-                    _selectedIndex = 0;
+                    _selectedIndex = _prefabs.Count - 1;
                 }
-                return CreateGhost(pos);
+                goto Retry;
             }
 		}
 
@@ -276,10 +289,10 @@ namespace Maritaria.WorldBuilder
 
             if (hit)
             {
-                var obj = Singleton.Manager<ManPointer>.inst.targetObject;
+                var obj = ray.transform;
                 try
                 {
-                    RemoveObj(obj.transform);
+                    RemoveObj(obj);
                 }
                 catch { }
 			}
